@@ -1,38 +1,25 @@
 # NET-02: SMB Service Vulnerable to Remote Code Execution
 
-| Field | Value |
-|---|---|
-| Severity | **Critical** |
-| CVSS v3.1 base score | 9.8 `[CONFIRM]` |
-| Affected service | 139/445 tcp Samba `[ADD version]` |
-| CVE / Reference | `[ADD CVE]` |
-| Environment | Metasploitable 2, isolated host-only lab |
+> **Critical** · CVSS 3.1 base 9.8 · 139/445 tcp Samba <!-- TODO: version --> · <!-- TODO: CVE -->
 
-## Description
+### What's wrong
 
 The Samba version in use is affected by a known vulnerability allowing remote code execution.
 
-## Steps to Reproduce (lab only)
+### Reproducing it in the lab
 
 1. Enumerate SMB with Nmap NSE scripts (`smb-os-discovery`, `smb-enum-shares`).
-2. Confirm version and vulnerability with Nessus `[ADD plugin ID]`.
-3. Exploit in the lab with `[ADD module]`.
-4. Record resulting access `[ADD result]`.
+2. Confirm version and vulnerability with Nessus <!-- TODO: plugin ID -->.
+3. Exploit in the lab with <!-- TODO: module -->.
+4. Record resulting access <!-- TODO: result -->.
 
-## Evidence
+<!-- TODO: paste sanitized command output (IPs replaced with <TARGET_IP>) and link the screenshot from ../evidence/ -->
 
-- Screenshot: `[ADD evidence/NET-02-*.png]`
-- Command output (sanitized, IPs replaced):
-
-```text
-[ADD sanitized output]
-```
-
-## Impact
+### Impact
 
 Full system compromise from the network.
 
-## Remediation
+### Recommended fix
 
 - Patch Samba to a supported version.
 - Disable SMBv1 and unnecessary shares.

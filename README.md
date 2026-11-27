@@ -1,114 +1,82 @@
-# Network VAPT — Metasploitable 2
+# Network Pentest: Metasploitable 2
 
-> **Authorized lab only.** This assessment targeted Metasploitable 2, an intentionally vulnerable Linux VM published by Rapid7 for training. It ran on a **host-only virtual network that I own**, with no route to the internet or any other network. All exploitation was limited to this isolated lab VM.
+Metasploitable 2 is Rapid7's deliberately broken Linux VM. I set it up on a host-only network next to a Kali VM and worked through it end to end: discovery, enumeration, vulnerability scanning, exploitation, and a look around afterwards to see how far a foothold could go. This repo is the documented result.
 
-![Type](https://img.shields.io/badge/Assessment-Network%20VAPT-blue) ![Scoring](https://img.shields.io/badge/Severity-CVSS%20v3.1-orange) ![Env](https://img.shields.io/badge/Environment-Host--only%20Lab-green)
+> **Lab only.** Both VMs sat on a host-only virtual network with no route to the internet or my home network. Every exploit in this write-up was run against the Metasploitable VM and nothing else.
 
-## At a Glance
-
-| Item | Detail |
-|---|---|
-| Target | Metasploitable 2 (Ubuntu 8.04 based VM) |
-| Assessment type | Internal network vulnerability assessment and penetration test |
-| Phases | Reconnaissance, enumeration, vulnerability assessment, exploitation, post-exploitation |
-| Tools | Nmap, Nessus, Metasploit Framework, Netcat, Nikto |
-| Full report | [reports/network-vapt-report.md](reports/network-vapt-report.md) |
-
-## Lab Topology
+## The lab
 
 ```
-┌──────────────────────────── Host-only virtual network (no internet) ────────────────────────────┐
-│                                                                                                  │
-│   ┌──────────────────────┐                                     ┌──────────────────────────┐       │
-│   │  Attacker VM         │   Nmap / Nessus / Metasploit        │  Target VM               │       │
-│   │  Kali Linux          │ ─────────────────────────────────▶ │  Metasploitable 2        │       │
-│   │  <ATTACKER_IP>       │                                     │  <TARGET_IP>             │       │
-│   └──────────────────────┘                                     └──────────────────────────┘       │
-│                                                                                                  │
-└──────────────────────────────────────────────────────────────────────────────────────────────────┘
-Hypervisor: [ADD VirtualBox / VMware]   Network mode: Host-only   NAT/Bridged: disabled
+ ┌────────────────────┐        host-only network        ┌──────────────────────┐
+ │  Kali Linux        │  ─────────────────────────────▶ │  Metasploitable 2    │
+ │  <ATTACKER_IP>     │   Nmap · Nessus · Metasploit    │  <TARGET_IP>         │
+ └────────────────────┘                                 └──────────────────────┘
+          no NAT, no bridged adapter, no internet access on either VM
 ```
 
-> Real lab IP addresses are replaced with `<ATTACKER_IP>` and `<TARGET_IP>` throughout this repository.
+I've replaced the real lab addresses with `<ATTACKER_IP>` and `<TARGET_IP>` everywhere in this repo.
 
-## Methodology
+## Toolkit
 
-Aligned with **PTES** (Penetration Testing Execution Standard) and **NIST SP 800-115**.
+Nmap for discovery and service fingerprinting · Nessus for vulnerability scanning · Nikto for the web server · Netcat for banner grabbing and manual connections · Metasploit Framework for controlled exploitation.
 
-| Phase | Activities | Tools |
-|---|---|---|
-| 1. Reconnaissance | Host discovery, full TCP port scan | Nmap |
-| 2. Enumeration | Service/version detection, NSE scripts, banner grabbing, web enumeration | Nmap, Netcat, Nikto |
-| 3. Vulnerability assessment | Authenticated/unauthenticated scanning, CVE correlation | Nessus, Nmap NSE |
-| 4. Exploitation | Controlled exploitation of validated findings | Metasploit Framework, Netcat |
-| 5. Post-exploitation | Privilege level, local enumeration, privilege escalation paths | Shell commands, Metasploit modules |
-| 6. Reporting | CVSS rating, impact, remediation | Markdown report |
+## How it went
 
-## Enumeration Summary
+**1. Finding the host and its ports.** A ping sweep of the lab subnet, then a full TCP scan. Metasploitable answers on a *lot* of ports, which is the first sign of trouble: a real server should expose only what it needs.
 
-Sanitized scan outputs are in [`nmap/`](nmap/).
+**2. Working out what each service was.** `nmap -sC -sV` against the open ports, followed by manual banner grabs with Netcat where Nmap's guess looked uncertain. I also ran Nikto against the web server and SMB enumeration scripts against Samba. The sanitized outputs are in [`nmap/`](nmap/).
 
-| Port | Service | Version observed | Notes |
-|---|---|---|---|
-| 21/tcp | FTP | `[ADD from your scan]` | Cleartext protocol, anonymous login check |
-| 22/tcp | SSH | `[ADD]` | Outdated version, weak credential check |
-| 23/tcp | Telnet | `[ADD]` | Cleartext remote login |
-| 80/tcp | HTTP | `[ADD]` | Nikto web scan |
-| 139,445/tcp | SMB | `[ADD]` | Samba version and share enumeration |
-| `[ADD]` | `[ADD]` | `[ADD]` | `[ADD other services you found]` |
+**3. Scanning for known vulnerabilities.** Nessus gave me a long list of findings. I cross-checked the critical ones against the service versions I had already identified, so I wasn't relying on the scanner alone.
+
+**4. Exploiting what I'd validated.** I only attempted exploitation for issues I had confirmed, and only against this VM. Several unrelated paths led to a shell, which says a lot about how exposed the box is.
+
+**5. Looking around after access.** Once I had a shell I checked who I was, what the system was, and whether a low-privileged user could become root.
 
 ## Findings
 
-| ID | Finding | Severity | CVSS v3.1 | Impact | Remediation |
-|---|---|---|---|---|---|
-| NET-01 | Outdated FTP service with known critical vulnerability `[ADD version/CVE]` | Critical | 9.8 `[CONFIRM]` | Remote command execution | Upgrade or remove the service |
-| NET-02 | SMB service vulnerable to remote code execution `[ADD version/CVE]` | Critical | 9.8 `[CONFIRM]` | Remote root compromise | Patch Samba, restrict SMB to trusted hosts |
-| NET-03 | Weak / default credentials on network services | High | 8.8 `[CONFIRM]` | Unauthorized access | Enforce strong unique passwords, disable defaults |
-| NET-04 | Cleartext Telnet remote administration | High | 7.4 `[CONFIRM]` | Credential interception | Disable Telnet, use SSH with keys |
-| NET-05 | Insecure FTP configuration (cleartext / anonymous access) | Medium | 5.3 `[CONFIRM]` | Data exposure, credential sniffing | Disable anonymous access, use SFTP/FTPS |
-| NET-06 | Outdated, unsupported services and OS | High | 7.5 `[CONFIRM]` | Many known CVEs exploitable | Upgrade to a supported OS and service versions |
-| NET-07 | Local privilege escalation path `[ADD vector]` | High | 7.8 `[CONFIRM]` | Low-privileged user gains root | Patch kernel/software, remove misconfigured SUID binaries |
-| NET-08 | Web server misconfigurations identified by Nikto `[ADD]` | Medium | 5.3 `[CONFIRM]` | Information disclosure | Remove default files, harden configuration |
-
-Detailed write-ups: [findings/](findings/). Severity is rated with CVSS v3.1 base scores; `[CONFIRM]` markers mean the vector must be checked against my own evidence before publishing.
-
-## Exploitation Summary
-
-| Finding | Approach | Result | Evidence |
+| ID | Issue | Severity | CVSS 3.1 |
 |---|---|---|---|
-| NET-01 | `[ADD Metasploit module or manual method]` | `[ADD e.g., shell as root]` | `[ADD evidence file]` |
-| NET-02 | `[ADD]` | `[ADD]` | `[ADD]` |
-| NET-03 | Credential testing against lab services with a small wordlist | `[ADD]` | `[ADD]` |
+| [NET-01](findings/NET-01-outdated-ftp-service.md) | FTP service running a version with a known critical flaw | 🔴 Critical | 9.8 |
+| [NET-02](findings/NET-02-smb-remote-code-execution.md) | Samba version vulnerable to remote code execution | 🔴 Critical | 9.8 |
+| [NET-03](findings/NET-03-weak-default-credentials.md) | Weak and default credentials on network services | 🟠 High | 8.8 |
+| [NET-07](findings/NET-07-local-privilege-escalation.md) | Local privilege escalation to root | 🟠 High | 7.8 |
+| [NET-06](findings/NET-06-outdated-unsupported-software.md) | End-of-life operating system and services | 🟠 High | 7.5 |
+| [NET-04](findings/NET-04-cleartext-telnet.md) | Telnet used for remote administration | 🟠 High | 7.4 |
+| [NET-05](findings/NET-05-insecure-ftp-configuration.md) | FTP allows cleartext and anonymous logins | 🟡 Medium | 5.3 |
+| [NET-08](findings/NET-08-web-server-misconfiguration.md) | Web server misconfigurations flagged by Nikto | 🟡 Medium | 5.3 |
 
-All exploitation was performed **only against the Metasploitable 2 VM in my isolated host-only lab**. No exploit was run against any other host.
+The full write-up, with an executive summary and remediation plan, is in [reports/network-vapt-report.md](reports/network-vapt-report.md).
 
-## Post-Exploitation Observations
+## After getting in
 
-- **Access level obtained:** `[ADD user / root]`
-- **Local enumeration:** OS and kernel version, users and groups, SUID binaries, cron jobs, writable files `[ADD what you observed]`
-- **Privilege escalation opportunities:** `[ADD vectors you validated]`
-- **Sensitive data accessible:** `[ADD type of data, no real values]`
-- **Persistence:** not established (out of scope for this lab)
+<!-- TODO: fill in from your own notes -->
+- **Access level reached:** <!-- TODO: e.g., root -->
+- **What I checked:** kernel and OS version, local users and groups, SUID binaries, sudo rights, cron jobs, world-writable files
+- **Privilege escalation:** see [NET-07](findings/NET-07-local-privilege-escalation.md)
+- **Persistence:** deliberately not attempted; out of scope for this lab
 
-## Remediation Priorities
+## What I would fix first
 
-1. **Patch or remove** outdated services (FTP, Samba, others listed in findings).
-2. **Disable cleartext protocols** (Telnet, FTP) and replace with SSH/SFTP.
-3. **Eliminate default and weak credentials**; enforce a password policy and lockout.
-4. **Reduce attack surface**: close unused ports and apply host-based firewall rules.
-5. **Upgrade the operating system** to a supported release and apply a patch-management process.
+1. **Patch or remove** the vulnerable FTP and Samba services. Either one alone gives remote root.
+2. **Change every default password** and enforce a real password policy.
+3. **Turn off Telnet and plain FTP** and use SSH/SFTP instead.
+4. **Close what isn't needed.** Most of the open ports have no business being reachable.
+5. **Move to a supported OS** and put patching on a schedule.
 
-## Repository Structure
+## Takeaways
+
+- Enumeration did most of the work. Once I had accurate service versions, the exploitable issues were obvious.
+- Nessus was good for coverage but needed checking. Matching its output to my own version data cut out the noise.
+- Seeing several independent routes to root made the case for defence in depth far more clearly than any textbook.
+
+## Layout
 
 ```
-.
-├── README.md
 ├── reports/network-vapt-report.md
-├── findings/            # one file per finding
-├── nmap/                # sanitized Nmap outputs
-└── evidence/            # sanitized screenshots
+├── findings/   one page per issue
+├── nmap/       sanitized scan output
+└── evidence/   sanitized screenshots
 ```
 
-## Disclaimer
-
-For educational and portfolio use only. Never scan or exploit systems you do not own or have written permission to test.
+---
+*Educational and portfolio use only. Never scan or exploit systems you don't own or have written permission to test.*

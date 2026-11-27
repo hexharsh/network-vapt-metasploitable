@@ -1,8 +1,8 @@
-# Nmap Outputs (Sanitized)
+# Nmap output
 
-Store **sanitized** scan outputs here.
+Sanitized scan output from the lab. Real addresses are replaced with `<TARGET_IP>` / `<ATTACKER_IP>`.
 
-## Commands Used
+## Commands I ran
 
 ```bash
 # Host discovery on the isolated lab network
@@ -21,7 +21,7 @@ nmap --script vuln -p <OPEN_PORTS> -oA nmap/03-vuln-scripts <TARGET_IP>
 nmap --script smb-os-discovery,smb-enum-shares,smb-enum-users -p 139,445 -oA nmap/04-smb-enum <TARGET_IP>
 ```
 
-## Sanitizing Before Commit
+## How I sanitize output before committing
 
 ```bash
 # Replace your real lab IPs before committing (example)
@@ -29,9 +29,4 @@ sed -i 's/<YOUR_REAL_TARGET_IP>/<TARGET_IP>/g; s/<YOUR_REAL_ATTACKER_IP>/<ATTACK
 grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}' nmap/* && echo "IPs still present, review before committing"
 ```
 
-## Files to Add
-
-- [ ] `01-full-tcp.nmap`
-- [ ] `02-service-version.nmap`
-- [ ] `03-vuln-scripts.nmap`
-- [ ] `04-smb-enum.nmap`
+<!-- TODO: add 01-full-tcp.nmap, 02-service-version.nmap, 03-vuln-scripts.nmap, 04-smb-enum.nmap -->

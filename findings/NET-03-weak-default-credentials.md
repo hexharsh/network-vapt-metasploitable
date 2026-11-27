@@ -1,37 +1,24 @@
 # NET-03: Weak or Default Credentials on Network Services
 
-| Field | Value |
-|---|---|
-| Severity | **High** |
-| CVSS v3.1 base score | 8.8 `[CONFIRM]` |
-| Affected service | `[ADD services, e.g., SSH, FTP, database]` |
-| CVE / Reference | N/A |
-| Environment | Metasploitable 2, isolated host-only lab |
+> **High** · CVSS 3.1 base 8.8 · <!-- TODO: services, e.g., SSH, FTP, database --> · no CVE (configuration issue)
 
-## Description
+### What's wrong
 
 One or more services accepted weak or default username/password combinations.
 
-## Steps to Reproduce (lab only)
+### Reproducing it in the lab
 
 1. Enumerate services that accept credentials.
-2. Test a small, targeted wordlist against lab services only `[ADD tool used]`.
-3. Record successful logins (do not publish passwords) `[ADD result]`.
+2. Test a small, targeted wordlist against lab services only <!-- TODO: tool used -->.
+3. Record successful logins (do not publish passwords) <!-- TODO: result -->.
 
-## Evidence
+<!-- TODO: paste sanitized command output (IPs replaced with <TARGET_IP>) and link the screenshot from ../evidence/ -->
 
-- Screenshot: `[ADD evidence/NET-03-*.png]`
-- Command output (sanitized, IPs replaced):
-
-```text
-[ADD sanitized output]
-```
-
-## Impact
+### Impact
 
 Attackers could log in directly and pivot to further compromise.
 
-## Remediation
+### Recommended fix
 
 - Change all default passwords.
 - Enforce password complexity and account lockout.

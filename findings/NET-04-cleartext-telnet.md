@@ -1,36 +1,23 @@
 # NET-04: Cleartext Telnet Remote Administration
 
-| Field | Value |
-|---|---|
-| Severity | **High** |
-| CVSS v3.1 base score | 7.4 `[CONFIRM]` |
-| Affected service | 23/tcp Telnet |
-| CVE / Reference | N/A |
-| Environment | Metasploitable 2, isolated host-only lab |
+> **High** · CVSS 3.1 base 7.4 · 23/tcp Telnet · no CVE (configuration issue)
 
-## Description
+### What's wrong
 
 Telnet transmits credentials and session data in cleartext.
 
-## Steps to Reproduce (lab only)
+### Reproducing it in the lab
 
 1. Confirm Telnet is open (`nmap -sV -p 23 <TARGET_IP>`).
-2. Capture a lab login with Wireshark/tcpdump and observe cleartext credentials `[ADD result, values redacted]`.
+2. Capture a lab login with Wireshark/tcpdump and observe cleartext credentials <!-- TODO: result, values redacted -->.
 
-## Evidence
+<!-- TODO: paste sanitized command output (IPs replaced with <TARGET_IP>) and link the screenshot from ../evidence/ -->
 
-- Screenshot: `[ADD evidence/NET-04-*.png]`
-- Command output (sanitized, IPs replaced):
-
-```text
-[ADD sanitized output]
-```
-
-## Impact
+### Impact
 
 Anyone on the network path can capture administrator credentials.
 
-## Remediation
+### Recommended fix
 
 - Disable Telnet.
 - Use SSH with key-based authentication.

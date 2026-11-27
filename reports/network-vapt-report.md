@@ -1,18 +1,14 @@
 # Network Vulnerability Assessment and Penetration Test Report
 
-**Target:** Metasploitable 2 lab VM (`<TARGET_IP>`)
-**Tester:** hexharsh
-**Assessment period:** `[ADD dates]`
-**Report version:** 1.0
-**Classification:** Public portfolio (sanitized)
+Prepared by Harsh ([@hexharsh](https://github.com/hexharsh)) · Version 1.0 (public, sanitized) <!-- TODO: test dates -->
 
-> This assessment was conducted entirely within an isolated, host-only virtual lab owned by the tester. Exploitation was limited to the Metasploitable 2 VM.
+Target: Metasploitable 2 lab VM (`<TARGET_IP>`) on an isolated host-only network that I own. Exploitation was limited to this VM.
 
 ---
 
 ## 1. Executive Summary
 
-A network penetration test of the Metasploitable 2 lab host identified **8 findings**: 2 Critical, 4 High, and 2 Medium. The host runs multiple outdated, unsupported services with publicly known exploits, accepts weak credentials, and exposes cleartext management protocols. During testing, `[ADD: e.g., root-level access was obtained through N independent paths]`.
+A network penetration test of the Metasploitable 2 lab host identified **8 findings**: 2 Critical, 4 High, and 2 Medium. The host runs multiple outdated, unsupported services with publicly known exploits, accepts weak credentials, and exposes cleartext management protocols. <!-- TODO: add one sentence on what access you reached, e.g. "root-level access was obtained through N independent paths." -->
 
 The main root cause is the absence of patch management and service hardening. Upgrading the operating system, removing legacy services, and enforcing strong authentication would remove most of the risk.
 
@@ -21,7 +17,6 @@ The main root cause is the absence of patch management and service hardening. Up
 | Critical | 2 |
 | High | 4 |
 | Medium | 2 |
-| Low | `[ADD]` |
 
 ## 2. Scope
 
@@ -43,11 +38,9 @@ The main root cause is the absence of patch management and service hardening. Up
 
 ## 4. Enumeration Results
 
-| Port | Service | Version | Vulnerable? |
-|---|---|---|---|
-| `[ADD]` | `[ADD]` | `[ADD]` | `[ADD]` |
+The full TCP scan showed a large number of exposed services, including FTP, SSH, Telnet, HTTP and SMB. Sanitized Nmap output, with the exact versions, is in [`../nmap/`](../nmap/).
 
-Raw outputs (sanitized): [`../nmap/`](../nmap/)
+<!-- TODO: optionally paste a port | service | version table from your scan -->
 
 ## 5. Findings
 
@@ -62,21 +55,17 @@ Raw outputs (sanitized): [`../nmap/`](../nmap/)
 | NET-07 | Local privilege escalation | High | 7.8 | [link](../findings/NET-07-local-privilege-escalation.md) |
 | NET-08 | Web server misconfiguration | Medium | 5.3 | [link](../findings/NET-08-web-server-misconfiguration.md) |
 
-> CVSS scores are typical base scores for these issue types and are marked `[CONFIRM]` in each finding until verified against evidence.
+
 
 ## 6. Exploitation Narrative
 
-`[ADD a short, original narrative of your attack path: which finding gave initial access, what access level, and how you confirmed it. Keep IPs as placeholders.]`
+<!-- TODO: write 3-5 sentences in your own words: which finding gave you initial access, what level of access it gave, how you confirmed it, and what you did next. Keep IPs as placeholders. -->
 
 ## 7. Post-Exploitation
 
-| Check | Observation |
-|---|---|
-| Current user / privileges | `[ADD]` |
-| Kernel / OS version | `[ADD]` |
-| SUID binaries / sudo rights | `[ADD]` |
-| Sensitive files accessible | `[ADD type only]` |
-| Privilege escalation | `[ADD]` |
+After gaining a shell I reviewed the current user and privileges, kernel and OS version, SUID binaries and sudo rights, readable sensitive files, and possible privilege escalation paths (see NET-07).
+
+<!-- TODO: add your observations for each of these -->
 
 ## 8. Remediation Plan
 
@@ -93,4 +82,4 @@ The target demonstrates how unpatched legacy services and weak authentication co
 
 ## Appendix: Tools and Versions
 
-Nmap `[ADD]`, Nessus Essentials `[ADD]`, Metasploit Framework `[ADD]`, Netcat, Nikto `[ADD]`.
+Nmap, Nessus Essentials, Metasploit Framework, Netcat, Nikto. <!-- TODO: versions -->
