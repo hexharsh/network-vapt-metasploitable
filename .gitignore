@@ -1,0 +1,22 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Raw, unsanitized artefacts: never commit these
+*.raw.*
+raw/
+unsanitized/
+*.burp
+*.pcap
+*.pcapng
+*.har
+*.nessus
+*.log
+
+# Secrets
+.env
+*.key
+*.pem
